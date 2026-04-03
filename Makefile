@@ -20,8 +20,12 @@ FT_PRINTF_LIB = $(FT_PRINTF_DIR)/libftprintf.a
 LIBFT_DIR = $(LIB_PATH)/libft
 LIBFT_LIB = $(LIBFT_DIR)/libft.a
 
+MLX_DIR = $(LIB_PATH)/minilibx-linux
+MLX_LIB = $(LIB_PATH)/minilibx-linux/libmlx.a
+
+
 # Libs (ordre: objets puis libs)
-LIBS = $(FT_PRINTF_LIB) $(LIBFT_LIB)
+LIBS = $(FT_PRINTF_LIB) $(LIBFT_LIB) $(MLX_LIB)
 
 all: $(LIBFT_LIB) $(FT_PRINTF_LIB) $(NAME)
 
