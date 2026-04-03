@@ -5,7 +5,7 @@ CFLAGS = -Wall -Wextra -Werror
 
 SRC_DIR = src
 OBJ_DIR = obj
-SRC = $(wildcard $() $(SRC_DIR)/*.c)
+SRC = $(wildcard $(SRC_DIR)/*.c)
 OBJ = $(SRC:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 
 # Includes
@@ -26,23 +26,22 @@ MLX_LIB = $(LIB_PATH)/minilibx-linux/libmlx.a
 GNL_DIR = $(LIB_PATH)/get_next_line
 GNL_LIB = $(LIB_PATH)/get_next_line/gnl.a
 
-
 # Libs (ordre: objets puis libs)
-LIBS = $(FT_PRINTF_LIB) $(LIBFT_LIB) $(MLX_LIB) $(GNL_LIB)
+LIBS = $(FT_PRINTF_LIB) $(LIBFT_LIB) $(MLX_LIB) $(GNL_LIB) -lX11 -lXext
 
-all: $(LIBFT_LIB) $(FT_PRINTF_LIB) $(GNL_LIB) $(NAME)
+all: $(LIBFT_LIB) $(FT_PRINTF_LIB) $(MLX_LIB) $(GNL_LIB) $(NAME)
 
 $(NAME): $(OBJ)
 	$(CC) $(CFLAGS) $(OBJ) $(LIBS) -o $(NAME)
+
+$(MLX_LIB):
+	$(MAKE) -C $(MLX_DIR)
 
 $(FT_PRINTF_LIB):
 	$(MAKE) -C $(FT_PRINTF_DIR)
 
 $(LIBFT_LIB):
 	$(MAKE) -C $(LIBFT_DIR)
-
-$(MLX_LIB):
-	$(MAKE) -C $(MLX_DIR)
 
 $(GNL_LIB):
 	$(MAKE) -C $(GNL_DIR)
@@ -55,13 +54,14 @@ clean:
 	rm -rf $(OBJ_DIR)
 	$(MAKE) -C $(FT_PRINTF_DIR) clean
 	$(MAKE) -C $(LIBFT_DIR) clean
+	$(MAKE) -C $(MLX_DIR) clean
 	$(MAKE) -C $(GNL_DIR) clean
 
 fclean: clean
 	rm -f $(NAME)
 	$(MAKE) -C $(FT_PRINTF_DIR) fclean
 	$(MAKE) -C $(LIBFT_DIR) fclean
-	$(MAKE) -C $(GNL_DIR) clean
+	$(MAKE) -C $(GNL_DIR) fclean
 
 re: fclean all
 
@@ -77,7 +77,7 @@ docker-build:
 	docker build --platform linux/amd64 -t $(DOCKER_IMAGE) .
 
 docker-run: docker-build
-	xhost +127.0.0.1
+	@xhost +127.0.0.1 2>/dev/null; true
 	docker run --rm \
 		--platform linux/amd64 \
 		-e DISPLAY=host.docker.internal:0 \
@@ -87,6 +87,7 @@ docker-run: docker-build
 		sh -c "make re && ./$(NAME) $(MAP)"
 
 docker-shell: docker-build
+	@xhost +127.0.0.1 2>/dev/null; true
 	docker run --rm -it \
 		--platform linux/amd64 \
 		-e DISPLAY=host.docker.internal:0 \

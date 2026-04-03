@@ -38,17 +38,9 @@ int	ft_strlen(char *str)
 
 void	ft_putnbru(unsigned int nb)
 {
-	unsigned int	n;
-
-	if (nb < 0)
-	{
-		ft_putchar('-');
-		nb *= -1;
-	}
-	n = (unsigned int)nb;
-	if (n / 10)
-		ft_putnbr(n / 10);
-	ft_putchar((n % 10) + '0');
+	if (nb / 10)
+		ft_putnbru(nb / 10);
+	ft_putchar((nb % 10) + '0');
 }
 
 void	ft_putnbr_base(unsigned long long int nbr, char *base)
@@ -58,11 +50,6 @@ void	ft_putnbr_base(unsigned long long int nbr, char *base)
 
 	n = nbr;
 	len = ft_strlen(base);
-	if (n < 0)
-	{
-		ft_putchar('-');
-		n = -n;
-	}
 	if (n / len)
 		ft_putnbr_base(n / len, base);
 	ft_putchar(base[n % len]);
