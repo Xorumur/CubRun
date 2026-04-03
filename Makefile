@@ -65,4 +65,34 @@ fclean: clean
 
 re: fclean all
 
-.PHONY: all clean fclean re
+# Docker targets (required on Mac M1 — minilibx-linux needs a Linux x86_64 env)
+# Prerequisites: Docker Desktop + XQuartz installed on macOS
+# Before first run: open XQuartz > Preferences > Security > allow network connections
+# Usage: make docker-run MAP=maps/my_map.cub
+
+DOCKER_IMAGE = cubrun-dev
+MAP ?= map.cub
+
+docker-build:
+	docker build --platform linux/amd64 -t $(DOCKER_IMAGE) .
+
+docker-run: docker-build
+	xhost +127.0.0.1
+	docker run --rm \
+		--platform linux/amd64 \
+		-e DISPLAY=host.docker.internal:0 \
+		-v $(shell pwd):/app \
+		-w /app \
+		$(DOCKER_IMAGE) \
+		sh -c "make re && ./$(NAME) $(MAP)"
+
+docker-shell: docker-build
+	docker run --rm -it \
+		--platform linux/amd64 \
+		-e DISPLAY=host.docker.internal:0 \
+		-v $(shell pwd):/app \
+		-w /app \
+		$(DOCKER_IMAGE) \
+		bash
+
+.PHONY: all clean fclean re docker-build docker-run docker-shell
